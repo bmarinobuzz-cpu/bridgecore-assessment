@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BridgeCore - Skills Assessment</title>
+    <style>
+        :root {
+            --primary: #54a938; /* BridgeCore Green */
+            --secondary: #2c5c2e; /* Dark Green */
+            --dark: #333333; 
+            --bg: #f4f7fe;
+            --gray: #6C757D;
+            --light-green: #f0fdf4;
+            --danger: #dc3545;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg); color: var(--dark); padding: 30px; min-height: 100vh; }
+        .container { max-width: 900px; margin: 0 auto; }
+        
+        /* --- HEADER --- */
+        .header-bar {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+            border-top: 8px solid var(--primary);
+            text-align: center;
+        }
+        
+        /* Image Styling */
+        .logo-img { 
+            max-width: 350px; 
+            height: auto; 
+            margin-bottom: 10px; 
+            display: block;
+        }
+
+        .header-text h2 { margin: 0; color: var(--dark); font-size: 1.8rem; font-weight: 800; }
+
+        /* --- SECTIONS --- */
+        .section { background: white; border-radius: 12px; padding: 35px; margin-bottom: 25px; border: 1px solid #eef2ff; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+        .section-header { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; border-bottom: 2px solid #f0f2f5; padding-bottom: 15px; }
+        .badge { background: var(--primary); color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .section h2 { color: var(--secondary); font-size: 1.5rem; margin: 0; font-weight: 700; }
+
+        /* --- FORMS --- */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 700; margin-bottom: 8px; font-size: 0.9rem; color: var(--gray); }
+        input[type="text"], input[type="email"], select, textarea { width: 100%; padding: 14px; border: 2px solid #e0e6ed; border-radius: 8px; font-size: 1rem; background: #fcfcfc; color: var(--dark); }
+        textarea { min-height: 120px; resize: vertical; }
+        
+        /* --- TYPING --- */
+        .typing-box { background: #fff; padding: 20px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 15px; font-size: 1.1rem; line-height: 1.6; color: #555; user-select: none; }
+        .timer-badge { background: var(--danger); color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; float: right; }
+        .status-badge { background: var(--secondary); color: white; padding: 5px 15px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; }
+
+        /* --- EPT & SCENARIOS --- */
+        .mcq-item { margin-bottom: 25px; border-bottom: 1px solid #f0f2f5; padding-bottom: 20px; }
+        .mcq-question { font-weight: 700; color: var(--dark); margin-bottom: 10px; display: block; font-size: 1rem; }
+        .mcq-options label { display: block; padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: 0.2s; font-size: 0.95rem; color: #555; }
+        .mcq-options label:hover { background: #f4f7fe; color: var(--primary); }
+        .help-box { background: #f8f9fa; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid var(--gray); font-size: 0.95rem; line-height: 1.6; color: #444; }
+        .scenario { background: var(--light-green); padding: 20px; border-radius: 8px; border: 1px solid #bcebd0; margin-bottom: 20px; color: var(--dark); font-weight: 500; }
+
+        /* --- BUTTONS --- */
+        .btn { display: inline-block; padding: 18px; border-radius: 8px; font-weight: 800; cursor: pointer; border: none; width: 100%; font-size: 1.1rem; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.2s; }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(84, 169, 56, 0.3); }
+        .btn-primary:hover { background: var(--secondary); transform: translateY(-2px); }
+        .btn-loading { opacity: 0.7; cursor: wait; }
+        .btn-outline { background: white; border: 2px solid var(--primary); color: var(--primary); margin-right: 10px; width: auto; padding: 10px 20px; font-size: 0.9rem; }
+        .btn-outline:hover { background: var(--light-green); }
+
+        /* --- RESULTS --- */
+        #results-panel { display: none; margin-top: 40px; border-top: 6px solid var(--primary); padding-top: 40px; text-align: center; animation: fadeUp 0.5s ease; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 30px 0; }
+        .metric-card { background: white; padding: 20px; border-radius: 12px; border: 1px solid #eee; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+        .metric-val { font-size: 1.8rem; font-weight: 800; color: var(--dark); display: block; margin-bottom: 5px; }
+        .metric-lbl { font-size: 0.8rem; color: var(--gray); text-transform: uppercase; font-weight: 700; }
+
+        /* --- MODAL --- */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; animation: fadeIn 0.3s; }
+        .modal-content { background: white; padding: 40px; border-radius: 16px; text-align: center; max-width: 400px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .checkmark-circle { width: 60px; height: 60px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+        .checkmark-circle svg { width: 30px; height: 30px; fill: white; }
+
+        @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        @media (max-width: 768px) { .form-grid, .metrics-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div id="success-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="checkmark-circle">
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        </div>
+        <h3 style="margin-bottom: 10px; color: var(--secondary);">Success!</h3>
+        <p style="margin-bottom: 25px; color: var(--gray);">Your assessment has been submitted successfully.</p>
+        <button class="btn btn-primary" style="width: 100%;" onclick="closeModal()">View Results</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="header-bar">
+        <img src="Logo BridgeCore01.jpg" alt="BridgeCore Logo" class="logo-img" onerror="this.style.display='none'; document.getElementById('alt-logo-text').style.display='block';">
+        
+        <h1 id="alt-logo-text" style="display:none; font-size:3rem; color:var(--primary); margin-bottom:10px;">BridgeCore</h1>
+        
+        <div class="header-text">
+            <h2>Author Success Specialist Assessment</h2>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="section">
+            <div class="section-header"><h2>Candidate Profile</h2></div>
+            <div class="form-grid">
+                <div class="form-group"><label>Full Name</label><input type="text" id="c-name" placeholder="e.g. Jane Doe"></div>
+                <div class="form-group"><label>Email Address</label><input type="email" id="c-email" placeholder="e.g. jane@email.com"></div>
+                <div class="form-group"><label>Phone Number</label><input type="text" id="c-phone" placeholder="e.g. 555-0199"></div>
+                <div class="form-group"><label>City / State</label><input type="text" id="c-city" placeholder="e.g. New York, NY"></div>
+            </div>
+        </div>
+
+        <div class="section typing-container">
+            <div class="section-header">
+                <span class="badge">Skill 1</span>
+                <h2>Typing Test</h2>
+            </div>
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <span id="type-status" class="status-badge">Phase 1: Practice Trial</span>
+                <span id="timer" class="timer-badge">2:00</span>
+            </div>
+            
+            <div class="help-box" id="type-instructions">
+                <strong>Instructions:</strong> Use this space to warm up (Practice Mode). Click the button below to start the trial. <br>
+                <span style="color:var(--primary); font-weight:bold;">NOTE:</span> The test will automatically STOP when you finish typing the text.
+            </div>
+
+            <div class="typing-box" id="sample-text">
+Writing books is hard work, but selling them is even harder. At BridgeCore, we make life easier for authors. We handle the technical marketing so they can focus on writing. Our team is kind, fast, and smart. We solve problems quickly and always treat our clients with respect.</div>
+            
+            <div style="margin-bottom: 15px;">
+                <button id="start-practice-btn" class="btn btn-outline" onclick="startPractice()">Start Practice Trial</button>
+            </div>
+
+            <div class="form-group">
+                <textarea id="typing-input" disabled placeholder="Waiting to start..." ></textarea>
+            </div>
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                <div style="font-weight:bold; color:var(--primary);">
+                    <span>Speed: <span id="wpm-display">0</span> WPM</span>
+                    <span style="margin-left: 20px;">Errors: <span id="error-display">0</span></span>
+                </div>
+                <button id="start-final-btn" class="btn btn-primary" style="width:auto; display:none;" onclick="startFinalTyping()">Start Official Test (2 Mins)</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <span class="badge">Skill 2</span>
+                <h2>English Proficiency (EPT)</h2>
+            </div>
+            <div class="help-box"><strong>Instructions:</strong> Select the most grammatically correct and professional option.</div>
+            
+            <div id="ept-container">
+                <div class="mcq-item"><span class="mcq-question">1. Which sentence is correct?</span><div class="mcq-options"><label><input type="radio" name="q1" value="0"> Their going to the meeting later.</label><label><input type="radio" name="q1" value="1"> They're going to the meeting later.</label><label><input type="radio" name="q1" value="0"> There going to the meeting later.</label></div></div>
+                <div class="mcq-item"><span class="mcq-question">2. Choose the most professional greeting:</span><div class="mcq-options"><label><input type="radio" name="q2" value="0"> Hey there,</label><label><input type="radio" name="q2" value="1"> Dear Mr. Smith,</label><label><input type="radio" name="q2" value="0"> Yo!</label></div></div>
+                <div class="mcq-item"><span class="mcq-question">3. Complete the sentence: "The team _____ ready to start."</span><div class="mcq-options"><label><input type="radio" name="q3" value="1"> is</label><label><input type="radio" name="q3" value="0"> are</label></div></div>
+                <div class="mcq-item"><span class="mcq-question">4. Which is correct?</span><div class="mcq-options"><label><input type="radio" name="q4" value="0"> Your welcome to join us.</label><label><input type="radio" name="q4" value="1"> You're welcome to join us.</label></div></div>
+                <div class="mcq-item"><span class="mcq-question">5. Choose the correct word: "We need to _____ the data."</span><div class="mcq-options"><label><input type="radio" name="q5" value="1"> analyze</label><label><input type="radio" name="q5" value="0"> analize</label></div></div>
+                <div class="mcq-item"><span class="mcq-question">6. "I have _____ experience in sales."</span><div class="mcq-options"><label><input type="radio" name="q6" value="0"> to much</label><label><input type="radio" name="q6" value="1"> too much</label><label><input type="radio" name="q6" value="0"> two much</label></div></div>
+                <div class="mcq-item"><span class="mcq-question">7. Which sentence is professional?</span><div class="mcq-options"><label><input type="radio" name="q7" value="0"> I gotta go check the files.</label><label><input type="radio" name="q7" value="1"> I will review the files immediately.</label></div></div>
+                <div class="mcq-item"><span class="mcq-question">8. "The company updated _____ policy."</span><div class="mcq-options"><label><input type="radio" name="q8" value="1"> its</label><label><input type="radio" name="q8" value="0"> it's</label></div></div>
+                <div class="mcq-item"><span class="mcq-question">9. "We _____ received your email."</span><div class="mcq-options"><label><input type="radio" name="q9" value="1"> have</label><label><input type="radio" name="q9" value="0"> has</label></div></div>
+                <div class="mcq-item"><span class="mcq-question">10. Choose the correct closing:</span><div class="mcq-options"><label><input type="radio" name="q10" value="0"> Cya,</label><label><input type="radio" name="q10" value="1"> Sincerely,</label><label><input type="radio" name="q10" value="0"> Cheers mate,</label></div></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <span class="badge">Skill 3</span>
+                <h2>Problem Solving</h2>
+            </div>
+
+            <div style="margin-bottom: 40px;">
+                <div class="help-box">
+                    <strong>What's Happening:</strong> Marketing is just numbers. <br><strong>Clicks</strong> = Interest. <strong>Sales</strong> = Purchase.
+                </div>
+                <div class="scenario">
+                    <strong>Scenario A (Diagnosis):</strong> 
+                    Ben's book got 1,000 ad clicks (lots of traffic!) but 0 sales. You checked his Amazon page and the book description is only one sentence long.
+                </div>
+                <div class="form-group">
+                    <label>Your Job: Explain to Ben why he isn't getting sales and suggest exactly what he needs to fix.</label>
+                    <textarea id="resp-diagnosis" placeholder="Hi Ben, I looked at your data..."></textarea>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 40px;">
+                <div class="help-box">
+                    <strong>What's Happening:</strong> When clients don't see sales, they panic and ask for a refund. Our job is to save the customer.
+                </div>
+                <div class="scenario">
+                    <strong>Scenario B (Retention):</strong> 
+                    A client writes: "This service is too expensive and I haven't sold any books yet. I want a refund right now."
+                </div>
+                <div class="form-group">
+                    <label>Your Job: How do you respond to convince them to stay and try a new strategy instead of quitting?</label>
+                    <textarea id="resp-retention" placeholder="I hear your frustration..."></textarea>
+                </div>
+            </div>
+
+            <div>
+                <div class="help-box">
+                    <strong>What's Happening:</strong> An author is overwhelmed and wants to quit the marketing tools, but you see they spent weeks designing a book cover.
+                </div>
+                <div class="scenario">
+                    <strong>Scenario C (The Pivot):</strong> 
+                    Write a short script (what you would say) to validate their feelings, but gently remind them that marketing is just as important as design.
+                </div>
+                <div class="form-group">
+                    <label>Your Job: Write the script.</label>
+                    <textarea id="resp-pivot" placeholder="I totally understand how you feel..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" id="submit-btn">Submit Entry</button>
+
+        <div id="results-panel">
+            <h2 style="color:var(--primary); font-size:2rem;">Application Submitted!</h2>
+            <p style="font-size:1.1rem;">Thank you. Our team has received your results automatically.</p>
+            
+            <div class="metrics-grid">
+                <div class="metric-card"><span class="metric-val" id="r-score">0%</span><span class="metric-lbl">Total Score</span></div>
+                <div class="metric-card"><span class="metric-val" id="r-wpm">0</span><span class="metric-lbl">Typing Speed (WPM)</span></div>
+                <div class="metric-card"><span class="metric-val" id="r-ept">0/10</span><span class="metric-lbl">EPT Score</span></div>
+                <div class="metric-card"><span class="metric-val" id="r-correct">0</span><span class="metric-lbl">Correct Chars</span></div>
+                <div class="metric-card"><span class="metric-val" id="r-incorrect">0</span><span class="metric-lbl">Incorrect Chars</span></div>
+                <div class="metric-card"><span class="metric-val" id="r-gross-wpm">0</span><span class="metric-lbl">Gross WPM</span></div>
+            </div>
+            
+            <div style="background: white; padding: 20px; border-radius: 12px; border: 1px solid #eef2ff; margin-top:20px;">
+                <p>You may now close this window.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==========================================================
+    // !!! IMPORTANT: PASTE YOUR DEPLOYED GOOGLE SCRIPT URL HERE !!!
+    // ==========================================================
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbya8Slg_nIv-FmWGyxxTpv5T6kGxOp8dDC-UXhWsutu9mKuB6j52tT6RttfBuzDzujx/exec'; 
+    // ==========================================================
+
+    // Global state for typing test
+    let typingPhase = 'warmup'; 
+    let timerInterval;
+    let timeLeft = 120; // 2 mins duration
+    let startTime = 0;
+    
+    // Store final test results globally
+    let finalTypingMetrics = { wpm: 0, grossWpm: 0, correctChars: 0, incorrectChars: 0 };
+
+    const textWarmup = "Writing books is hard work, but selling them is even harder. At BridgeCore, we make life easier for authors. We handle the technical marketing so they can focus on writing. Our team is kind, fast, and smart. We solve problems quickly and always treat our clients with respect.";
+    const textFinal = "Customer success is about more than just answering questions. It is about understanding the goal of the author. When a problem arises, we do not panic. Instead, we look at the data, find the root cause, and propose a solution. A happy author is a successful author who trusts us to handle the details.";
+
+    // --- 1. EPT SCORING ---
+    function calculateEPT() {
+        let score = 0;
+        for(let i=1; i<=10; i++) {
+            const selected = document.querySelector(`input[name="q${i}"]:checked`);
+            if(selected && selected.value === "1") score++;
+        }
+        return score;
+    }
+
+    // --- 2. TYPING TEST ENGINE ---
+    
+    function startPractice() {
+        if(typingPhase !== 'warmup') return;
+        setupTestEnvironment();
+        startTimer(120);
+    }
+    
+    function startFinalTyping() {
+        typingPhase = 'final';
+        document.getElementById('sample-text').innerText = textFinal;
+        document.getElementById('start-final-btn').style.display = 'none';
+        document.getElementById('type-status').innerText = "Phase 2: Official Test (2 Mins)";
+        document.getElementById('type-instructions').innerHTML = "<strong>Your Job:</strong> Type the new text below exactly as you see it. <br>The test will automatically STOP when you finish typing the text.";
+        document.getElementById('wpm-display').innerText = "0";
+        document.getElementById('error-display').innerText = "0";
+        
+        setupTestEnvironment();
+        startTimer(120);
+    }
+
+    function setupTestEnvironment() {
+        // Prepare UI
+        document.getElementById('start-practice-btn').style.display = 'none';
+        const typingInput = document.getElementById('typing-input');
+        typingInput.disabled = false;
+        typingInput.value = "";
+        typingInput.placeholder = "Type here...";
+        typingInput.focus();
+
+        // Prepare Logic
+        startTime = Date.now();
+    }
+
+    function startTimer(seconds) {
+        timeLeft = seconds;
+        document.getElementById('timer').innerText = formatTime(timeLeft);
+        const typingInput = document.getElementById('typing-input');
+        
+        // Add listeners
+        typingInput.addEventListener('input', updateTypingMetrics);
+
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timer').innerText = formatTime(timeLeft);
+            updateTypingMetrics(); // Update metrics every second
+            if (timeLeft <= 0) { 
+                forceStop();
+            }
+        }, 1000);
+    }
+
+    function forceStop() {
+        clearInterval(timerInterval);
+        timerInterval = null; // Clear variable so we don't trigger again
+        const typingInput = document.getElementById('typing-input');
+        typingInput.removeEventListener('input', updateTypingMetrics);
+        endPhase(); 
+    }
+
+    function formatTime(s) {
+        const m = Math.floor(s / 60);
+        const sec = s % 60;
+        return `${m}:${sec < 10 ? '0' : ''}${sec}`;
+    }
+
+    function calculateTypingMetrics() {
+        const sampleText = (typingPhase === 'final') ? textFinal : textWarmup;
+        const inputText = document.getElementById('typing-input').value;
+        const reference = sampleText.trim();
+        
+        let correctChars = 0;
+        let incorrectChars = 0;
+        let totalTypedChars = inputText.length;
+        
+        // Character-by-Character comparison
+        for (let i = 0; i < totalTypedChars; i++) {
+            if (inputText[i] === reference[i]) {
+                correctChars++;
+            } else {
+                incorrectChars++;
+            }
+        }
+        
+        // Calculate Time Elapsed (in minutes)
+        // If the test stops early, we use current time - start time
+        const durationMinutes = (Date.now() - startTime) / 60000;
+        
+        // Prevent division by zero if handled too fast
+        const safeDuration = durationMinutes > 0 ? durationMinutes : 0.001; 
+        const totalWordsTyped = totalTypedChars / 5;
+
+        // Gross WPM (WPM based on all typed characters)
+        const grossWpm = Math.round(totalWordsTyped / safeDuration);
+
+        // Net WPM = Gross WPM - (Incorrect Characters / Duration in Minutes)
+        const errorsPerMinute = incorrectChars / safeDuration;
+        const netWpm = Math.max(0, Math.round(grossWpm - errorsPerMinute));
+        
+        document.getElementById('wpm-display').innerText = netWpm;
+        document.getElementById('error-display').innerText = incorrectChars;
+
+        const currentMetrics = {
+            wpm: netWpm,
+            grossWpm: grossWpm,
+            correctChars: correctChars,
+            incorrectChars: incorrectChars,
+            totalWords: reference.split(/\s+/).length // Total words in the sample text
+        };
+
+        // Store results if this is the final test
+        if (typingPhase === 'final') {
+            finalTypingMetrics = currentMetrics;
+        }
+
+        return currentMetrics;
+    }
+
+    function updateTypingMetrics() {
+        calculateTypingMetrics();
+        
+        // --- NEW: CHECK IF FINISHED ---
+        const sampleText = (typingPhase === 'final') ? textFinal : textWarmup;
+        const inputText = document.getElementById('typing-input').value;
+        
+        // If the user has typed enough characters to match the length of the sample
+        if (inputText.length >= sampleText.length) {
+            forceStop();
+        }
+    }
+
+    function endPhase() {
+        const typingInput = document.getElementById('typing-input');
+        typingInput.disabled = true;
+        
+        // Perform one last calculation based on exact time elapsed
+        const finalResults = calculateTypingMetrics();
+
+        if (typingPhase === 'warmup') {
+            typingPhase = 'waiting';
+            document.getElementById('type-status').innerText = "Trial Complete";
+            document.getElementById('type-instructions').innerHTML = `<strong>Trial Score:</strong> ${finalResults.wpm} WPM. <br>Great job! Now take a breath. When you are ready for the <strong>Official Test</strong>, click the button below.`;
+            document.getElementById('start-final-btn').style.display = 'block';
+        } else if (typingPhase === 'final') {
+            typingPhase = 'done';
+            document.getElementById('type-status').innerText = "Test Complete";
+            document.getElementById('type-instructions').innerHTML = `<strong>Final Score:</strong> ${finalResults.wpm} WPM, ${finalResults.incorrectChars} Errors.`;
+            finalTypingMetrics = finalResults; 
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('success-modal').style.display = 'none';
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    // --- 3. SUBMISSION ENGINE (Google Sheets) ---
+    document.getElementById('submit-btn').addEventListener('click', function() {
+        if(timerInterval) forceStop(); // Ensure timer stops on submit
+        
+        const btn = document.getElementById('submit-btn');
+        const name = document.getElementById('c-name').value;
+        const email = document.getElementById('c-email').value;
+
+        // Basic Validation
+        if(!name || !email) { 
+            alert("Please enter your Name and Email at the top.");
+            return; 
+        }
+        if(scriptURL.includes('PASTE_YOUR')) { 
+            alert("System Error: The Google Script URL has not been configured in the code.");
+            return; 
+        }
+
+        btn.innerText = "Submitting...";
+        btn.classList.add('btn-loading');
+
+        // Map Inputs
+        const r_pivot = document.getElementById('resp-pivot').value;
+        const r_diagnosis = document.getElementById('resp-diagnosis').value; 
+        const r_retention = document.getElementById('resp-retention').value;
+
+        // Calc Scores
+        const eptScore = calculateEPT(); // 0-10
+        
+        // Simplified Overall Score
+        const overall = Math.round(((eptScore * 10) + Math.min(100, (finalTypingMetrics.wpm/40)*100))/2);
+
+        const data = {
+            candidate: { 
+                name: name, email: email, 
+                phone: document.getElementById('c-phone').value,
+                city: document.getElementById('c-city').value
+            },
+            scores: { overall },
+            metrics: { 
+                eptScore: eptScore + "/10",
+                netWpm: finalTypingMetrics.wpm, 
+                grossWpm: finalTypingMetrics.grossWpm,
+                correctChars: finalTypingMetrics.correctChars,
+                incorrectChars: finalTypingMetrics.incorrectChars,
+                totalWordsTyped: Math.round(finalTypingMetrics.grossWpm * 2 / 5) 
+            },
+            responses: { 
+                diagnosis: r_diagnosis, 
+                retention: r_retention, 
+                pivot: r_pivot 
+            }
+        };
+
+        // Send to Google Apps Script
+        fetch(scriptURL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        }).then(response => {
+            // Success
+            document.getElementById('success-modal').style.display = 'flex';
+            
+            document.getElementById('results-panel').style.display = 'block';
+            document.getElementById('r-score').innerText = overall + "%";
+            document.getElementById('r-wpm').innerText = finalTypingMetrics.wpm;
+            document.getElementById('r-ept').innerText = eptScore + "/10";
+            document.getElementById('r-correct').innerText = finalTypingMetrics.correctChars;
+            document.getElementById('r-incorrect').innerText = finalTypingMetrics.incorrectChars;
+            document.getElementById('r-gross-wpm').innerText = finalTypingMetrics.grossWpm;
+            
+            btn.style.display = 'none';
+        }).catch(error => {
+            console.error('Error!', error.message);
+            alert("Submission failed. Please check your internet connection.");
+            btn.innerText = "Submit Entry";
+            btn.classList.remove('btn-loading');
+        });
+    });
+</script>
+</body>
+</html>
